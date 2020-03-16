@@ -12,7 +12,7 @@ import org.axonframework.spring.stereotype.Aggregate
 import java.util.*
 
 @Aggregate
-class AddressAggregate @CommandHandler constructor(createAddressCommand: CreateAddressCommand) {
+class AddressAggregate @CommandHandler constructor(createAddressCommand: CreateAddressCommand?) {
     @AggregateIdentifier
     private var id: UUID? = null
 
@@ -29,20 +29,25 @@ class AddressAggregate @CommandHandler constructor(createAddressCommand: CreateA
     private var addressStatus: AddressStatus = AddressStatus.CREATED
     private var validationReason: String? = null
 
+    protected constructor() : this(null)
+
     init {
-        AggregateLifecycle.apply(AddressCreatedEvent(
-                id = createAddressCommand.id,
-                firstName = createAddressCommand.firstName,
-                lastName = createAddressCommand.lastName,
-                street = createAddressCommand.street,
-                co = createAddressCommand.co,
-                coType = createAddressCommand.coType,
-                streetNumber = createAddressCommand.streetNumber,
-                additionToAddress = createAddressCommand.additionToAddress,
-                zip = createAddressCommand.zip,
-                city = createAddressCommand.city,
-                country = createAddressCommand.country
-        ))
+        createAddressCommand?.also {
+            AggregateLifecycle.apply(AddressCreatedEvent(
+                    id = createAddressCommand.id,
+                    firstName = createAddressCommand.firstName,
+                    lastName = createAddressCommand.lastName,
+                    street = createAddressCommand.street,
+                    co = createAddressCommand.co,
+                    coType = createAddressCommand.coType,
+                    streetNumber = createAddressCommand.streetNumber,
+                    additionToAddress = createAddressCommand.additionToAddress,
+                    zip = createAddressCommand.zip,
+                    city = createAddressCommand.city,
+                    country = createAddressCommand.country
+            ))
+        }
+
     }
 
     @EventSourcingHandler
